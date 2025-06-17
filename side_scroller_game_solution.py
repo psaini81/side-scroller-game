@@ -1,5 +1,6 @@
 import pygame
 import sys
+import time
 
 # Pygame setup
 pygame.init()
@@ -10,7 +11,9 @@ CLOCK = pygame.time.Clock()
 
 # Load images (ensure 'player.png' and 'mouse.png' are in the same folder)
 PLAYER_IMG = pygame.image.load("player.png")
+PLAYER_IMG = pygame.transform.scale(PLAYER_IMG, (60, 60))  # Resize to 60x60 pixels
 MOUSE_IMG = pygame.image.load("mouse.png")
+MOUSE_IMG = pygame.transform.scale(MOUSE_IMG, (40, 40))  # Resize to 40x40 pixels
 
 # Base Character class
 class Character:
@@ -62,7 +65,9 @@ def main():
     player = Player(100, 150)
     mouse = Mouse(600, 150)
     speed = 5
-
+    
+    last_collision_time = 0
+    
     while True:
         CLOCK.tick(60)
         for event in pygame.event.get():
@@ -81,10 +86,12 @@ def main():
         if keys[pygame.K_DOWN]:
             player.move(0, speed)
 
-        # Collision check
-        if check_collision(player, mouse):
+        # Collision check with cooldown
+        current_time = time.time()
+        if check_collision(player, mouse) and current_time - last_collision_time > 1:
             player.collide()
             mouse.collide()
+            last_collision_time = current_time
 
         draw_window(player, mouse)
 
